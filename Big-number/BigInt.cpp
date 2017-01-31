@@ -197,9 +197,7 @@ class BigInt {
                  }
              }
              int flag = 0;
-             for (; flag < ans_l - 1; flag++) {
-                 if (ans.num[flag] != '0') break;
-             }
+             while (flag < ans_l - 1 && ans.num[flag] == '0') flag++;
              ans.num = ans.num.substr(flag);
              if (ans.num == "0") ans.sign = "+";
          }
@@ -258,15 +256,15 @@ class BigInt {
          BigInt sub = abs(*this), ans = abs(S);
          int w = sub.num.length() - ans.num.length();
          for (int i = 0; i < w; i++) ans.num += "0";
-         while (w >= 0) { 
+         while (w >= 0) {
              int s = 0;
              while (ans <= sub) {
                  sub -= ans;
                  s++;
              }
              res.num += s + '0';
-             w--;
              ans.num = ans.num.substr(0, ans.num.length() - 1);
+             w--;
          }
          int flag = 0;
          while (flag < (int)res.num.length() - 1 && res.num[flag] == '0') flag++;
