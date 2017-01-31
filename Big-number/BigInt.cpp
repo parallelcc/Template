@@ -32,7 +32,7 @@ void fft(vector<complex<double> >& y, int on) {
             }
         }
     }
-    if (on == -1) for (int i = 0; i < len; i++) y[i].real(y[i].real() / len);
+    if (on == -1) for (auto& i : y) i.real(i.real() / len);
 }
 class BigInt {
  private:
@@ -236,7 +236,7 @@ class BigInt {
          fft(x2, 1);
          for (int i = 0; i < len; i++) x1[i] = x1[i] * x2[i];
          fft(x1, -1);
-         for (auto i : x1) sum.push_back((int)(i.real() + 0.5));
+         for (auto& i : x1) sum.push_back((int)(i.real() + 0.5));
          for (int i = 0; i < len; i++) {
              sum[i + 1] += sum[i] / 10;
              sum[i] %= 10;
