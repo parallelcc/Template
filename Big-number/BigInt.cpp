@@ -238,13 +238,13 @@ class BigInt {
          fft(x2, 1);
          for (int i = 0; i < len; i++) x1[i] = x1[i] * x2[i];
          fft(x1, -1);
-         for (auto i: x1) sum.push_back((int)(i.real() + 0.5));
+         for (auto i : x1) sum.push_back((int)(i.real() + 0.5));
          for (int i = 0; i < len; i++) {
              sum[i + 1] += sum[i] / 10;
              sum[i] %= 10;
          }
          len = len1 + len2 - 1;
-         while(sum[len] <= 0 && len > 0) len--;
+         while (sum[len] <= 0 && len > 0) len--;
          res.num = "";
          for (int i = len; i >= 0; i--) res.num += sum[i] + '0';
          if (res.num == "0") res.sign = "+";
@@ -279,7 +279,7 @@ class BigInt {
          BigInt sub = abs(*this), ans = abs(S);
          int w = sub.num.length() - ans.num.length();
          for (int i = 0; i < w; i++) ans.num += "0";
-         while (w >= 0) { 
+         while (w >= 0) {
              int s = 0;
              while (ans <= sub) {
                  sub -= ans;
