@@ -3,20 +3,24 @@
 using namespace std;  // NOLINT
 const int MAXN = 1010;
 const int INF = 0x3f3f3f3f;
+typedef int T;
+typedef int L;
 struct Edge{
     int v;
-    int cost, cap, rev;
-    Edge(int v, int cap, int cost, int rev) {
+    T cost;
+    L cap;
+    int rev;
+    Edge(int v, L cap, T cost, int rev) {
         this->v = v;
         this->cap = cap;
         this->cost = cost;
         this->rev = rev;
     }
 };
-vector<vector<Edge> > E(MAXN);
+vector<Edge> E[MAXN];
 bool vis[MAXN];
 int cnt[MAXN];
-int dist[MAXN];
+T dist[MAXN];
 pair<int, int> pre[MAXN];
 int n, m;
 bool SPFA(int start, int end) {
@@ -49,11 +53,11 @@ bool SPFA(int start, int end) {
     if (dist[end] == INF) return false;
     return true;
 }
-int minCostMaxflow(int s, int t, int &cost) {
-    int flow = 0;
+L minCostMaxflow(int s, int t, T &cost) {
+    L flow = 0;
     cost = 0;
     while (SPFA(s, t)) {
-        int Min = INF;
+        L Min = INF;
         for (int i = t; pre[i].first != -1; i = pre[i].first) {
             if (Min > E[pre[i].first][pre[i].second].cap) {
                 Min = E[pre[i].first][pre[i].second].cap;
@@ -78,13 +82,15 @@ int main() {
         N = n;
         for (int i = 0; i < n + 1; i++) E[i].clear();
         for (int i = 0; i < m; i++) {
-            int u, v, w, c;
+            int u, v;
+            L w;
+            T c;
             cin >> u >> v >> w >> c;
             E[u].push_back(Edge(v, w, c, E[v].size()));
             E[v].push_back(Edge(u, 0, -c, E[u].size() - 1));
         }
-        int cost;
-        int flow = minCostMaxflow(S, N, cost);
+        T cost;
+        L flow = minCostMaxflow(S, N, cost);
         cout << flow << ' ' << cost << '\n';
     }
     return 0;
