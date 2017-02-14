@@ -48,125 +48,115 @@ class BigInt {
          this->num = "0";
          this->sign = "+";
      }
-     BigInt(const int& S) {
-         if (S < 0) {
-             this->num = std::to_string(-S);
+     BigInt(const int& t) {
+         if (t < 0) {
+             this->num = std::to_string(-t);
              this->sign = "-";
          } else {
-             this->num = std::to_string(S);
+             this->num = std::to_string(t);
              this->sign = "+";
          }
      }
-     BigInt(const LL& S) {
-         if (S < 0) {
-             this->num = std::to_string(-S);
+     BigInt(const LL& t) {
+         if (t < 0) {
+             this->num = std::to_string(-t);
              this->sign = "-";
          } else {
-             this->num = std::to_string(S);
+             this->num = std::to_string(t);
              this->sign = "+";
          }
      }
-     BigInt(const string& S) {
-         if (S[0] == '-') {
-             this->num = S.substr(1);
+     BigInt(const string& t) {
+         if (t[0] == '-') {
+             this->num = t.substr(1);
              this->sign = "-";
          } else {
-             this->num = S;
+             this->num = t;
              this->sign = "+";
          }
          int flag = 0;
          while (flag < (int)this->num.length() - 1 && this->num[flag] == '0') flag++;
          this->num = this->num.substr(flag);
      }
-     BigInt(const char* const& S) {
-         new (this)BigInt(string(S));
+     BigInt(const char* const& t) {
+         new (this)BigInt(string(t));
      }
-     BigInt(const BigInt& S) {
-         this->num = S.num;
-         this->sign = S.sign;
-     }
-     BigInt& operator= (const BigInt& S) {
-         this->num = S.num;
-         this->sign = S.sign;
-         return *this;
-     }
-     bool operator< (const BigInt& S) const {
-         if (this->sign != S.sign) {
-             if (this->sign == "-") return true;
+     friend bool operator< (const BigInt& t, const BigInt& s) {
+         if (t.sign != s.sign) {
+             if (t.sign == "-") return true;
              else return false;
          } else {
-             if (this->sign == "-") {
-                 if (this->num.length() == S.num.length()) {
-                     return this->num > S.num;
+             if (t.sign == "-") {
+                 if (t.num.length() == s.num.length()) {
+                     return t.num > s.num;
                  } else {
-                     return this->num.length() > S.num.length();
+                     return t.num.length() > s.num.length();
                  }
              } else {
-                 if (this->num.length() == S.num.length()) {
-                     return this->num < S.num;
+                 if (t.num.length() == s.num.length()) {
+                     return t.num < s.num;
                  } else {
-                     return this->num.length() < S.num.length();
+                     return t.num.length() < s.num.length();
                  }
              }
          }
      }
-     bool operator> (const BigInt& S) const {
-         return S < *this;
+     friend bool operator> (const BigInt& t, const BigInt& s) {
+         return s < t;
      }
-     bool operator== (const BigInt& S) const {
-         if (this->num == S.num && this->sign == S.sign) return true;
-         else return false;
+     friend bool operator== (const BigInt& t, const BigInt& s) {
+         return t.num == s.num && t.sign == s.sign;
      }
-     bool operator!= (const BigInt& S) const {
-         return !(*this == S);
+     friend bool operator!= (const BigInt& t, const BigInt& s) {
+         return !(t == s);
      }
-     bool operator<= (const BigInt& S) const {
-         return *this == S || *this < S;
+     friend bool operator<= (const BigInt& t, const BigInt& s) {
+         return t == s || t < s;
      }
-     bool operator>= (const BigInt& S) const {
-         return *this == S || *this > S;
+     friend bool operator>= (const BigInt& t, const BigInt& s) {
+         return t == s || t > s;
      }
-     friend BigInt abs(const BigInt& S) {
-         BigInt ans = S;
+     friend BigInt abs(const BigInt& t) {
+         BigInt ans = t;
          if (ans.sign == "-") ans.sign = "+";
          return ans;
      }
-     friend BigInt operator- (const BigInt& S) {
-         BigInt ans = S;
+     friend BigInt operator- (const BigInt& t) {
+         BigInt ans = t;
          if (ans.sign == "-") ans.sign = "+";
          else ans.sign = "-";
          return ans;
      }
-     friend istream& operator>> (istream& in, BigInt& S) {
+     friend istream& operator>> (istream& in, BigInt& t) {
          string s;
-         cin >> s;
-         S = s;
+         in >> s;
+         t = s;
          return in;
      }
-     friend ostream& operator<< (ostream& out, const BigInt& S) {
-         cout << S.to_string();
+     friend ostream& operator<< (ostream& out, const BigInt& t) {
+         out << t.to_string();
          return out;
      }
-     BigInt operator+ (const BigInt& S) const {
+     friend BigInt operator+ (const BigInt& t, const BigInt& s) {
          BigInt ans, sub;
-         if (this->num.length() < S.num.length()) {
-             ans = S;
-             sub = *this;
-         } else if (this->num.length() == S.num.length()) {
-             if (this->num < S.num) {
-                 ans = S;
-                 sub = *this;
+         if (t.num.length() < s.num.length()) {
+             ans = s;
+             sub = t;
+         } else if (t.num.length() == s.num.length()) {
+             if (t.num < s.num) {
+                 ans = s;
+                 sub = t;
              } else {
-                 ans = *this;
-                 sub = S;
+                 ans = t;
+                 sub = s;
              }
          } else {
-             ans = *this;
-             sub = S;
+             ans = t;
+             sub = s;
          }
          int sub_l = sub.num.length();
          int ans_l = ans.num.length();
-         if (this->sign == S.sign) {
+         if (t.sign == s.sign) {
              for (int i = 1; i <= sub_l; i++) {
                  ans.num[ans_l - i] += sub.num[sub_l - i] - '0';
              }
@@ -203,19 +193,19 @@ class BigInt {
          }
          return ans;
      }
-     BigInt operator- (const BigInt& S) const {
-         BigInt sub = S;
+     friend BigInt operator- (const BigInt& t, const BigInt& s) {
+         BigInt sub = s;
          if (sub.sign == "+") sub.sign = "-";
          else sub.sign = "+";
-         return *this + sub;
+         return t + sub;
      }
-     BigInt operator* (const BigInt& S) const {
+     friend BigInt operator* (const BigInt& t, const BigInt& s) {
          BigInt res;
-         if (S.sign == this->sign) res.sign = "+";
+         if (s.sign == t.sign) res.sign = "+";
          else res.sign = "-";
          vector<complex<double> > x1, x2;
          vector<int> sum;
-         string str1 = this->num, str2 = S.num;
+         string str1 = t.num, str2 = s.num;
          int len1 = str1.length();
          int len2 = str2.length();
          int len = 1;
@@ -248,21 +238,21 @@ class BigInt {
          if (res.num == "0") res.sign = "+";
          return res;
      }
-     BigInt operator/ (const BigInt& S) const {
-         if (S == 0) throw;
+     friend BigInt operator/ (const BigInt& t, const BigInt& s) {
+         if (s == 0) throw;
          BigInt res;
-         if (S.sign == this->sign) res.sign = "+";
+         if (s.sign == t.sign) res.sign = "+";
          else res.sign = "-";
-         BigInt sub = abs(*this), ans = abs(S);
+         BigInt sub = abs(t), ans = abs(s);
          int w = sub.num.length() - ans.num.length();
          for (int i = 0; i < w; i++) ans.num += "0";
          while (w >= 0) {
-             int s = 0;
+             int d = 0;
              while (ans <= sub) {
                  sub -= ans;
-                 s++;
+                 d++;
              }
-             res.num += s + '0';
+             res.num += d + '0';
              ans.num = ans.num.substr(0, ans.num.length() - 1);
              w--;
          }
@@ -272,38 +262,38 @@ class BigInt {
          if (res.num == "0") res.sign = "+";
          return res;
      }
-     BigInt operator% (const BigInt& S) const {
-         if (S == 0) throw;
-         BigInt sub = abs(*this), ans = abs(S);
+     friend BigInt operator% (const BigInt& t, const BigInt& s) {
+         if (s == 0) throw;
+         BigInt sub = abs(t), ans = abs(s);
          int w = sub.num.length() - ans.num.length();
          for (int i = 0; i < w; i++) ans.num += "0";
          while (w >= 0) {
-             int s = 0;
+             int d = 0;
              while (ans <= sub) {
                  sub -= ans;
-                 s++;
+                 d++;
              }
              w--;
              ans.num = ans.num.substr(0, ans.num.length() - 1);
          }
-         sub.sign = this->sign;
+         sub.sign = t.sign;
          if (sub.num == "0") sub.sign = "+";
          return sub;
      }
-     BigInt& operator+= (const BigInt& S) {
-         return *this = *this + S;
+     friend BigInt& operator+= (BigInt& t, const BigInt& s) {
+         return t = t + s;
      }
-     BigInt& operator-= (const BigInt& S) {
-         return *this = *this - S;
+     friend BigInt& operator-= (BigInt& t, const BigInt& s) {
+         return t = t - s;
      }
-     BigInt& operator*= (const BigInt& S) {
-         return *this = *this * S;
+     friend BigInt& operator*= (BigInt& t, const BigInt& s) {
+         return t = t * s;
      }
-     BigInt& operator/= (const BigInt& S) {
-         return *this = *this / S;
+     friend BigInt& operator/= (BigInt& t, const BigInt& s) {
+         return t = t / s;
      }
-     BigInt& operator%= (const BigInt& S) {
-         return *this = *this % S;
+     friend BigInt& operator%= (BigInt& t, const BigInt& s) {
+         return t = t % s;
      }
      BigInt subnum(int r, int l) {
          BigInt ans = this->num.substr(this->num.length() - l, l - r);
