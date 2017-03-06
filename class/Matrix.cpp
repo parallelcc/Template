@@ -6,15 +6,13 @@ class Mat {
  public:
      int n, m;
      vector<vector<T> > val;
-     Mat(const int& n, const int& m) {
-        this->n = n;
-        this->m = m;
+     Mat(const int n, const int m) : n(n), m(m) {
         val.resize(n);
         for (auto& i : val) {
             i.resize(m);
         }
      }
-     explicit Mat(const int& n) : Mat(n, n) {}
+     explicit Mat(const int n) : Mat(n, n) {}
      friend istream& operator>> (istream& in, Mat& t) {
          for (auto& i : t.val) {
              for (auto& j : i) in >> j;
@@ -31,7 +29,7 @@ class Mat {
          }
          return out;
      }
-     friend Mat operator- (const Mat& t) {
+     friend const Mat operator- (const Mat& t) {
          auto ans = t;
          for (auto& i : ans.val) {
              for (auto& j : i) {
@@ -40,7 +38,7 @@ class Mat {
          }
          return ans;
      }
-     friend Mat operator+ (const Mat& t, const Mat& s) {
+     friend const Mat operator+ (const Mat& t, const Mat& s) {
          if (t.n != s.n || t.m != s.m) throw;
          auto ans = t;
          for (int i = 0; i < ans.n; i++) {
@@ -50,10 +48,10 @@ class Mat {
          }
          return ans;
      }
-     friend Mat operator- (const Mat& t, const Mat& s) {
+     friend const Mat operator- (const Mat& t, const Mat& s) {
          return t + (-s);
      }
-     friend Mat operator* (const Mat& t, const Mat& s) {
+     friend const Mat operator* (const Mat& t, const Mat& s) {
          if (t.m != s.n) throw;
          Mat ans(t.n, s.m);
          for (int i = 0; i < ans.n; i++) {
@@ -68,7 +66,7 @@ class Mat {
          return ans;
      }
      template <typename S>
-     friend Mat operator* (const Mat& t, const S& s) {
+     friend const Mat operator* (const Mat& t, const S& s) {
         auto ans = t;
         for (auto& i : ans.val) {
             for (auto& j : i) {
@@ -78,7 +76,7 @@ class Mat {
         return ans;
      }
      template <typename S>
-     friend Mat operator/ (const Mat& t, const S& s) {
+     friend const Mat operator/ (const Mat& t, const S& s) {
          auto ans = t;
          for (auto& i : ans.val) {
              for (auto& j : i) {
@@ -88,7 +86,7 @@ class Mat {
          return ans;
      }
      template <typename S>
-     friend Mat operator% (const Mat& t, const S& s) {
+     friend const Mat operator% (const Mat& t, const S& s) {
          auto ans = t;
          for (auto& i : ans.val) {
              for (auto& j : i) {
@@ -98,7 +96,7 @@ class Mat {
          return ans;
      }
      template <typename S>
-     friend Mat operator* (const S& s, const Mat& t) {
+     friend const Mat operator* (const S& s, const Mat& t) {
          return t * s;
      }
      int Gauss(vector<T>& x) {

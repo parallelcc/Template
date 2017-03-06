@@ -1,7 +1,7 @@
 // Copyright 2017 Parallelc
 #include <bits/stdc++.h>
 using namespace std;  // NOLINT
-typedef int64_t LL;
+using LL = int64_t;
 const double PI = acos(-1);
 void rader(vector<complex<double> >& y) {
     int len = y.size();
@@ -44,11 +44,8 @@ class BigInt {
          if (this->sign == "-") return this->sign + this->num;
          else return this->num;
      }
-     BigInt() {
-         this->num = "0";
-         this->sign = "+";
-     }
-     BigInt(const int& t) {
+     BigInt() : num("0"), sign("+") {}
+     BigInt(const int t) {
          if (t < 0) {
              this->num = std::to_string(-t);
              this->sign = "-";
@@ -57,7 +54,7 @@ class BigInt {
              this->sign = "+";
          }
      }
-     BigInt(const LL& t) {
+     BigInt(const LL t) {
          if (t < 0) {
              this->num = std::to_string(-t);
              this->sign = "-";
@@ -78,9 +75,7 @@ class BigInt {
          while (flag < (int)this->num.length() - 1 && this->num[flag] == '0') flag++;
          this->num = this->num.substr(flag);
      }
-     BigInt(const char* const& t) {
-         new (this)BigInt(string(t));
-     }
+     BigInt(char* const t) : BigInt(string(t)) {}
      friend bool operator< (const BigInt& t, const BigInt& s) {
          if (t.sign != s.sign) {
              if (t.sign == "-") return true;
@@ -116,12 +111,12 @@ class BigInt {
      friend bool operator>= (const BigInt& t, const BigInt& s) {
          return t == s || t > s;
      }
-     friend BigInt abs(const BigInt& t) {
+     friend const BigInt abs(const BigInt& t) {
          BigInt ans = t;
          if (ans.sign == "-") ans.sign = "+";
          return ans;
      }
-     friend BigInt operator- (const BigInt& t) {
+     friend const BigInt operator- (const BigInt& t) {
          BigInt ans = t;
          if (ans.sign == "-") ans.sign = "+";
          else ans.sign = "-";
@@ -137,7 +132,7 @@ class BigInt {
          out << t.to_string();
          return out;
      }
-     friend BigInt operator+ (const BigInt& t, const BigInt& s) {
+     friend const BigInt operator+ (const BigInt& t, const BigInt& s) {
          BigInt ans, sub;
          if (t.num.length() < s.num.length()) {
              ans = s;
@@ -193,13 +188,13 @@ class BigInt {
          }
          return ans;
      }
-     friend BigInt operator- (const BigInt& t, const BigInt& s) {
+     friend const BigInt operator- (const BigInt& t, const BigInt& s) {
          BigInt sub = s;
          if (sub.sign == "+") sub.sign = "-";
          else sub.sign = "+";
          return t + sub;
      }
-     friend BigInt operator* (const BigInt& t, const BigInt& s) {
+     friend const BigInt operator* (const BigInt& t, const BigInt& s) {
          BigInt res;
          if (s.sign == t.sign) res.sign = "+";
          else res.sign = "-";
@@ -238,7 +233,7 @@ class BigInt {
          if (res.num == "0") res.sign = "+";
          return res;
      }
-     friend BigInt operator/ (const BigInt& t, const BigInt& s) {
+     friend const BigInt operator/ (const BigInt& t, const BigInt& s) {
          if (s == 0) throw;
          BigInt res;
          if (s.sign == t.sign) res.sign = "+";
@@ -262,7 +257,7 @@ class BigInt {
          if (res.num == "0") res.sign = "+";
          return res;
      }
-     friend BigInt operator% (const BigInt& t, const BigInt& s) {
+     friend const BigInt operator% (const BigInt& t, const BigInt& s) {
          if (s == 0) throw;
          BigInt sub = abs(t), ans = abs(s);
          int w = sub.num.length() - ans.num.length();
@@ -295,12 +290,12 @@ class BigInt {
      friend BigInt& operator%= (BigInt& t, const BigInt& s) {
          return t = t % s;
      }
-     BigInt subnum(int r, int l) {
+     const BigInt subnum(int r, int l) {
          BigInt ans = this->num.substr(this->num.length() - l, l - r);
          ans.sign = this->sign;
          return ans;
      }
-     BigInt subnum(int l) {
+     const BigInt subnum(int l) {
          return this->subnum(0, l);
      }
 };
