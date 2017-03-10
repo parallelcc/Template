@@ -17,7 +17,7 @@ class BIT {
              x += lowbit(x);
          }
      }
-     T query(int x) {
+     T sum(int x) {
          T ans = 0;
          while (x) {
              ans += tr[x];

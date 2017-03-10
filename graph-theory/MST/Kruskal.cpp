@@ -9,16 +9,16 @@ class UFA {
 
  public:
      explicit UFA(int n) {
-         bcj.resize(n + 1);
+         bcj.resize(n);
          iota(bcj.begin(), bcj.end(), 0);
      }
-     const int getr(int k) {
-         if (bcj[k] != k) bcj[k] = getr(bcj[k]);
+     const int gr(int k) {
+         if (bcj[k] != k) bcj[k] = gr(bcj[k]);
          return bcj[k];
      }
-     void merge(int k1, int k2) {
-         int p1 = getr(k1);
-         int p2 = getr(k2);
+     void mg(int k1, int k2) {
+         int p1 = gr(k1);
+         int p2 = gr(k2);
          if (p1 == p2) return;
          bcj[p1] = p2;
      }
@@ -36,8 +36,8 @@ T kruskal(vector<edge>& ed, int n) {
     T qz = 0;
     int us_num = 0;
     for (auto& i : ed) {
-        if (a.getr(i.u) != a.getr(i.v)) {
-            a.merge(i.u, i.v);
+        if (a.gr(i.u) != a.gr(i.v)) {
+            a.mg(i.u, i.v);
             qz += i.w;
             us_num++;
         }
