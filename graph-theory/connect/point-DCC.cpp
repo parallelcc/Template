@@ -1,12 +1,12 @@
 // Copyright 2017 Parallelc 
 #include <bits/stdc++.h>
 using namespace std;  // NOLINT
-vector<vector<pair<int, int>>> tarjan(const vector<vector<int>>& lj) {
+vector<vector<pair<int, int>>> tarjan(const vector<vector<int>>& lj, int m) {
     int n = lj.size();
     vector<int> dfn(n), low(n);
-    int ind = 1;
+    int ind = 1, num = 0;
     stack<pair<int, int>> s;
-    vector<vector<pair<int, int>>> edge;
+    vector<vector<pair<int, int>>> edge(m);
     function<void(int, int)> dfs = [&](int k, int pre) {
         dfn[k] = low[k] = ind++;
         for (auto i : lj[k]) {
@@ -17,12 +17,12 @@ vector<vector<pair<int, int>>> tarjan(const vector<vector<int>>& lj) {
                 // find it is cut
                 if (dfn[k] <= low[i]) {
                     pair<int, int> tmp;
-                    edge.resize(edge.size() + 1);
                     do {
                         tmp = s.top();
-                        edge.back().push_back(move(s.top()));
+                        edge[num].push_back(tmp);
                         s.pop();
                     } while (tmp.first != k || tmp.second != i);
+                    num++;
                 }
             } else if (i != pre) {
                 low[k] = min(low[k], dfn[i]);

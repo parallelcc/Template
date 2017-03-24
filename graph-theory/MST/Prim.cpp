@@ -1,32 +1,40 @@
 // Copyright 2017 Parallelc
-// o(V*V) dense map, from 1 to n
+// o(ElogV) sparse map, from 1 to n
 #include <bits/stdc++.h>
 using namespace std;  // NOLINT
 using LL = int64_t;
 using T = int;
 const T INF = 0x3f3f3f3f;
-T prim(const vector<vector<T> >& lj) {
-    vector<int> us(lj.size());
+struct edge {
+    int v;
+    T w;
+    bool operator<(const edge& e) const {return w > e.w;}
+};
+T prim(const vector<vector<edge>>& lj) {
+    int us_num = 0, n = lj.size();
     T qz = 0;
-    int us_num = 0, n = lj.size() - 1;
-    vector<T> a(n + 1, INF);
-    a[1] = 0;
-    while (us_num < n) {
-        T minz = INF;
-        int mini = 1;
-        for (int i = 1; i <= n; i++) {
-            if (us[i] == 0 && minz > a[i]) {
-                minz = a[i];
-                mini = i;
-            }
-        }
-        if (minz == INF) break;
-        us[mini] = 1;
-        qz += minz;
-        us_num++;
-        for (int i = 1; i <= n; i++) {
-            if (us[i] == 0 && a[i] > lj[mini][i]) {
-                a[i] = lj[mini][i];
+    vector<int> us(n);
+    vector<T> a(n, INF);
+    a[0] = 0;
+    priority_queue<edge> q;
+    q.push({0, 0});
+    edge mini;
+    while (!q.empty() && us_num < n) {
+        do {
+            mini = q.top();
+            q.pop();
+        }while(us[mini.v] == 1 && !q.empty());
+        if (us[mini.v] == 0) {
+            qz += mini.w;
+            us[mini.v] = 1;
+            us_num++;
+            for (auto& i : lj[mini.v]) {
+                if (us[i.v] == 0) {
+                    if (a[i.v] > i.w) {
+                        a[i.v] = i.w;
+                        q.push({i.v, i.w});
+                    }
+                }
             }
         }
     }

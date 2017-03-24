@@ -12,8 +12,9 @@ struct edge {
 };
 T dij(const vector<vector<edge>>& lj, int S, int N) {
     int n = lj.size();
-    vector<int> us(n), pre(n);
+    vector<int> pre(n);
     vector<T> a(n, INF);
+    a[S] = 0;
     priority_queue<edge> q;
     q.push({S, 0});
     edge mini;
@@ -21,31 +22,26 @@ T dij(const vector<vector<edge>>& lj, int S, int N) {
         do {
             mini = q.top();
             q.pop();
-        }while(us[mini.v] && !q.empty());
-        if (!us[mini.v]) {
-            us[mini.v] = 1;
-            if (mini.v == N) break;
+        }while(mini.w > a[mini.v] && !q.empty());
+        if (mini.v == N) break;
+        if (mini.w == a[mini.v]) {
             for (auto& i : lj[mini.v]) {
-                if (!us[i.v]) {
-                    T k = mini.w + i.w;
-                    if (a[i.v] > k) {
-                        a[i.v] = k;
-                        q.push({i.v, k});
-                        pre[i.v] = mini.v;
-                    }
+                T k = mini.w + i.w;
+                if (a[i.v] > k) {
+                    a[i.v] = k;
+                    q.push({i.v, k});
+                    pre[i.v] = mini.v;
                 }
             }
         }
     }
-    if (us[N]) {
+    if (a[N] != INF) {
         function<void(int)> pri = [&](int k)->void {
             if (k != S) pri(pre[k]);
             cout << k;
             if (k != N) cout << ' ';
         };
         pri(N);
-        return a[N];
-    } else {
-        return INF;
     }
+    return a[N];
 }

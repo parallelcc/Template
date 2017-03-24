@@ -6,15 +6,14 @@ using LL = int64_t;
 using T = int;
 const T INF = 0x3f3f3f3f;
 T dij(const vector<vector<int>>& lj, int S, int N) {
-    vector<int> us(lj.size());
-    vector<int> pre(lj.size());
-    int n = lj.size() - 1;
-    vector<T> a(n + 1, INF);
+    int n = lj.size();
+    vector<int> us(n), pre(n);
+    vector<T> a(n, INF);
     a[S] = 0;
     while (us[N] == 0) {
         T min = INF;
         int mini = S;
-        for (int i = 1; i <= n; i++) {
+        for (int i = 0; i < n; i++) {
             if (us[i] == 0 && min > a[i]) {
                 min = a[i];
                 mini = i;
@@ -22,7 +21,7 @@ T dij(const vector<vector<int>>& lj, int S, int N) {
         }
         if (min == INF) break;
         us[mini] = 1;
-        for (int i = 1; i <= n; i++) {
+        for (int i = 0; i < n; i++) {
             if (us[i] == 0 && a[i] > a[mini] + lj[mini][i])  {
                 a[i] = a[mini] + lj[mini][i];
                 pre[i] = mini;
@@ -36,7 +35,6 @@ T dij(const vector<vector<int>>& lj, int S, int N) {
             if (k != N) cout << ' ';
         };
         pri(N);
-        return a[N];
     }
-    return INF;
+    return a[N];
 }
