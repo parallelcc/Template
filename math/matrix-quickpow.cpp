@@ -1,82 +1,59 @@
-#include<iostream>
-#include<cstdio>
-#include<cstring>
-#include<algorithm>
-using namespace std;
-#define N 32
-int r,p; //行列数,取模数 
-struct Matrix
-{
-	int a[N][N];
-	void MakeI() { //变为单位矩阵
-		memset(a,0,sizeof(a));
-		for(int i = 0;i < r; ++i)
-		a[i][i] = 1;
-	}
-}; 
-Matrix operator + (const Matrix & m,const Matrix & n)
-{
-	Matrix c;
-	for(int i=0;i<r;i++)
-	{
-		for(int j=0;j<r;j++)
-		c.a[i][j]=(m.a[i][j]+n.a[i][j])%p;
-	}
-	return c;
-}
-Matrix operator * (const Matrix & m,const Matrix & n)
-{
-	Matrix c;
-    for(int i = 0; i < r; i++)
-    {
-        for(int j = 0; j < r; j++)
-        {
-            c.a[i][j] = 0;
-            for(int k = 0; k < r; k++)
-            {
-                c.a[i][j] = (c.a[i][j]+m.a[i][k]*n.a[k][j]%p)%p;//矩阵乘法的乘法定义
-            }
+// Copyright 2017 Parallelc
+#include <bits/stdc++.h>
+using namespace std;  // NOLINT
+using LL = int64_t;
+const LL mod = 1e9 + 7;
+
+struct Mat {
+    int n;
+    vector<vector<LL>> val;
+    Mat(int n, int op = 0) : n(n) {
+        val.resize(n);
+        for (auto& i : val) i.resize(n);
+        if (op) {
+            for (int i = 0; i < n; i++) val[i][i] = 1;
         }
     }
-    return c;
-}
-Matrix PowMod(const Matrix & m,int k)
-{ //求m^k mod p
-	Matrix result;
-	result.MakeI(); //MakeI是将result变为单位矩阵
-	Matrix base = m;
-	while(k) {
-		if( k & 1) result = result*base; //result*base mod p
-		k >>= 1;
-		base = base*base;
-	}
-	return result;
+    friend const Mat operator+ (const Mat& t, const Mat& s) {
+        auto ans = t;
+        for (int i = 0; i < ans.n; i++) {
+            for (int j = 0; j < ans.n; j++) {
+                ans.val[i][j] += s.val[i][j];
+                ans.val[i][j] %= mod;
+            }
+        }
+        return ans;
+    }
+    friend const Mat operator* (const Mat& t, const Mat& s) {
+        Mat ans(t.n);
+        for (int i = 0; i < ans.n; i++) {
+            for (int j = 0; j < ans.n; j++) {
+                for (int k = 0; k < ans.n; k++) {
+                    ans.val[i][j] += t.val[i][k] * s.val[k][j] % mod;
+                    ans.val[i][j] %= mod;
+                }
+            }
+        }
+        return ans;
+    }
+};
+
+Mat PowMod(Mat a, LL n) {
+    Mat ans(a.n, 1);
+    while(n) {
+        if(n & 1) ans = ans * a;
+        a = a * a;
+        n >>= 1;
+    }
+    return ans;
 } 
-Matrix PowSumMod(Matrix &m,int n)
-{// return (a+ a^2 + ... + a^n) Mod p;
-	Matrix re;
-	re.MakeI(); //MakeI是将result变为单位矩阵
-	if( n == 1) return m;
-	if( n % 2 == 0)return (re+PowMod(m,n/2))*PowSumMod(m,n/2);
-	else return (re+PowMod(m,(n-1)/2)) * PowSumMod(m,(n-1)/2)+ PowMod(m,n);
-}
-int main()
-{
-	int k;
-	scanf("%d%d%d",&r,&k,&p);
-	Matrix s;
-	for(int i=0;i<r;i++)
-	{
-		for(int j=0;j<r;j++) 
-		{
-			scanf("%d",&s.a[i][j]);
-			s.a[i][j]%=p;
-		}
-	}
-	s=PowSumMod(s,k);
-	for(int i=0;i<r;i++)
-	{
-		for(int j=0;j<r;j++)  printf("%d%c",s.a[i][j],j==r-1?'\n':' ');
-	}
-	return 0;
+
+Mat PowSumMod(Mat& a, LL n) {// return (a+ a^2 + ... + a^n) Mod p;
+    Mat ans(a.n, 1);
+    if(n == 1) return a;
+    if (n % 2 == 0)
+        return (ans + PowMod(a, n / 2)) * PowSumMod(a, n / 2);
+    else
+        return (ans + PowMod(a, (n - 1) / 2)) * PowSumMod(a, (n - 1) / 2) +
+               PowMod(a, n);
 }

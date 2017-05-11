@@ -1,23 +1,18 @@
 // Copyright 2016 Parallelc
-#include <iostream>
-#include <algorithm>
-#include <cmath>
-using namespace std;  // NOLINT
-int prime[100010];
-int pd[100010];
-int h = 0;
-void db() {
-    for (int i = 2; i < 100000; i++) {
+#include <bits/stdc++.h>
+using namespace std; // NOLINT
+vector<int> prime, pd;
+void db(int n) {
+    pd.resize(n);
+    prime.reserve(n);
+    for (int i = 2; i < n; i++) {
         if (pd[i] == 0) {
-            prime[h++] = i;
+            prime.push_back(i);
         }
-        for (int j = 0; j < h && i * prime[j] < 100000; j++) {
-            pd[i*prime[j]] = 1;
-            if (i%prime[j] == 0) break;
+        for (auto j : prime) {
+            if (i * j >= n) break;
+            pd[i * j] = 1;
+            if (i % j == 0) break;
         }
     }
-}
-int main() {
-    db();
-    return 0;
 }

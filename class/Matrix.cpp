@@ -5,14 +5,14 @@ template <typename T>
 class Mat {
  public:
      int n, m;
-     vector<vector<T> > val;
-     Mat(const int n, const int m) : n(n), m(m) {
+     vector<vector<T>> val;
+     Mat(int n, int m) : n(n), m(m) {
         val.resize(n);
         for (auto& i : val) {
             i.resize(m);
         }
      }
-     explicit Mat(const int n) : Mat(n, n) {}
+     explicit Mat(int n) : Mat(n, n) {}
      friend istream& operator>> (istream& in, Mat& t) {
          for (auto& i : t.val) {
              for (auto& j : i) in >> j;
@@ -56,7 +56,6 @@ class Mat {
          Mat ans(t.n, s.m);
          for (int i = 0; i < ans.n; i++) {
              for (int j = 0; j < ans.m; j++) {
-                 ans.val[i][j] = T(0);
                  for (int k = 0; k < t.m; k++) {
                      ans.val[i][j] += t.val[i][k] * s.val[k][j];  // % mod;
                      // ans.val[i][j] %= mod;
@@ -98,48 +97,5 @@ class Mat {
      template <typename S>
      friend const Mat operator* (const S& s, const Mat& t) {
          return t * s;
-     }
-     int Gauss(vector<T>& x) {
-         int z = 0;
-         auto ans = *this;
-         for (int i = 0, j = 0; i < ans.m && j < ans.n; i++, j++) {
-             int r = j;
-             // if float, need fabs && eps
-             for (int k = j + 1; k < ans.n; k++) {
-                 if (abs(ans.val[k][i]) > abs(ans.val[r][i])) r = k;
-             }
-             if (ans.val[r][i] == T(0)) {
-                 j--;
-                 continue;
-             } else {
-                 z++;
-             }
-             swap(ans.val[j], ans.val[r]);
-             swap(x[j], x[r]);
-             /*
-             for (int k = 0; k < ans.n; k++) {
-                 if (k != j && ans.val[k][i]) {
-                     x[k] ^= x[j];
-                     for (int l = i; l < ans.m; l++) {
-                         ans.val[k][l] ^= ans.val[j][l];
-                     }
-                 }
-             }
-             */
-             x[j] /= ans.val[j][i];
-             for (int k = i + 1; k < ans.m; k++) ans.val[j][k] /= ans.val[j][i];
-             ans.val[j][i] = T(1);
-             for (int k = 0; k < ans.n; k++) {
-                 if (k != j) {
-                     x[k] -= x[j] * ans.val[k][i];
-                     for (int l = i + 1; l < ans.m; l++) {
-                         ans.val[k][l] -= ans.val[j][l] * ans.val[k][i];
-                     }
-                     ans.val[k][i] = T(0);
-                 }
-             }
-         }
-         for (int i = z; i < ans.n; i++) if (x[i] != T(0)) return -1;
-         return z;
      }
 };

@@ -1,13 +1,14 @@
-int PowMod(int a, int b, int c)
-{
-	int ans = 1;
-	a = a % c;
-	while(b>0)
-	{
-		if(b & 1)
-		ans = (ans * a) % c;
-		b >>= 1;
-		a = (a * a) % c;
-	}
-	return ans;
-} 
+#include <bits/stdc++.h>
+using namespace std;
+using LL = int64_t;
+
+LL PowMod(LL a, LL n, LL mod) {
+    LL ans = 1;
+    while (n) {
+        if (n & 1)
+            ans = (ans * a) % mod;
+        a = (a * a) % mod;
+        n >>= 1;
+    }
+    return ans;
+}

@@ -3,7 +3,11 @@
 using namespace std;  // NOLINT
 int hungary(const vector<vector<int>>& lj, int m) {
     int n = lj.size();
-    vector<int> llink(n, -1), rlink(m, -1), pre(n, -1), us(m, -1);
+    static vector<int> llink, rlink, pre, us;
+    llink.resize(n), fill(llink.begin(), llink.end(), -1);
+    rlink.resize(m), fill(rlink.begin(), rlink.end(), -1);
+    pre.resize(n), fill(pre.begin(), pre.end(), -1);
+    us.resize(m), fill(us.begin(), us.end(), -1);
     int ans = 0;
     for (int i = 0; i < n; i++) {
         if (llink[i] == -1) {

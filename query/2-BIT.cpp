@@ -1,37 +1,49 @@
 // Copyright 2017 Parallelc
 #include <bits/stdc++.h>
-using namespace std;  // NOLINT
-template<typename T>
+#include <ext/numeric>
+using namespace std;
+using namespace __gnu_cxx;
+template<typename T, class op = plus<T>, class sub = minus<T>>
 class BIT {
  private:
      vector<vector<T>> tr;
-     T lowbit(T x) {return x & (-x);}
+     T lowbit(T x) { return x & (-x); }
 
  public:
-     explicit BIT(int n, int m) {
+     BIT() {}
+     BIT(int n, int m) {
          tr.resize(n + 1);
          for (auto& i : tr) i.resize(m + 1);
      }
-     void add(int x, int y, T k) {
-         while (x < tr.size()) {
-             int tmp = y;
-             while (tmp < tr[x].size()) {
-                tr[x][tmp] += k;
-                tmp += lowbit(tmp);
+     BIT(vector<vector<T>>& a) {
+         int n = a.size();
+         int m = a[0].size();
+         tr.resize(n + 1);
+         for (auto& i : tr) i.resize(m + 1);
+         for (int i = 0; i < n; i++) {
+             for (int j = 0; j < m; j++) {
+                 add(i, j, a[i][j]);
              }
-             x += lowbit(x);
+         }
+     }
+     void add(int x, int y, T k) {
+         x++, y++;
+         for (int i = x; i < tr.size(); i += lowbit(i)) {
+             for (int j = y; j < tr[x].size(); j += lowbit(j)) {
+                 tr[i][j] = op()(tr[i][j], k);
+             }
          }
      }
      T sum(int x, int y) {
-         T ans = 0;
-         while (x) {
-             int tmp = y;
-             while (tmp) {
-                ans += tr[x][tmp];
-                tmp -= lowbit(tmp);
+         T ans = identity_element(op());
+         for (int i = x; i; i -= lowbit(i)) {
+             for (int j = y; j; j -= lowbit(j)) {
+                 ans = op()(ans, tr[i][j]);
              }
-             x -= lowbit(x);
          }
          return ans;
+     }
+     T que(int x1, int y1, int x2, int y2) {
+         return op()(sub()(sub()(sum(x2, y2), sum(x2, y1)), sum(x1, y2)), sum(x1, y1));
      }
 };
