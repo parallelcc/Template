@@ -3,7 +3,9 @@
 using namespace std;
 using LL = int64_t;
 LL countp(LL k){
-    vector<LL> f(340000), g(340000);
+    static vector<LL> f, g;
+    int num = sqrt(k) + 5;
+    f.resize(num), g.resize(num);
     LL m;
     for (m = 1; m * m <= k; m++) f[m] = k / m - 1;
     iota(g.begin() + 1, g.begin() + m + 1, 0);

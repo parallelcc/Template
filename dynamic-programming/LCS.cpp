@@ -1,34 +1,29 @@
-#include<iostream>
-#include<cstdio>
-#include<cstring>
-#include<algorithm>
+#include <bits/stdc++.h>
 using namespace std;
-char a[1005],b[1005],c[1005];
-int al,bl,dp[1005][1005];
-int main()
-{
-	int i,j;
-	scanf("%s%s",a+1,b+1);
-	for(i=1;a[i];i++)
-	{
-		for(j=1;b[j];j++)
-		{
-			if(a[i]==b[j]) dp[i][j]=dp[i-1][j-1]+1;
-			else dp[i][j]=max(dp[i-1][j],dp[i][j-1]);
-		}
-	}
-	printf("%d\n",dp[--i][--j]);
-	//输出一个子序列
-	c[dp[i][j]]='\0';
-	while(dp[i][j])
-	{
-		if(a[i]==b[j]) c[dp[--i][--j]]=a[i+1];
-		else
-		{
-			if(dp[i][j]==dp[i-1][j]) i--;
-			else if(dp[i][j]==dp[i][j-1]) j--;
-		}
-	}
-	printf("%s\n",c);
-	return 0;
-} 
+template <typename T>
+int lcs(vector<T>& a, vector<T>& b) {
+    int n = a.size();
+    int m = b.size();
+    static vector<vector<int>> dp;
+    dp.resize(n + 1);
+    for (auto& i : dp) i.resize(m + 1);
+    for (int i = 1; i <= n; i++) {
+        for(int j = 1; j <= m; j++) {
+            if(a[i - 1] == b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;
+            else dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+        }
+    }
+    return dp[n][m];
+    static vector<T> ans;
+    ans.resize(dp[n][m]);
+    while (dp[n][m]) {
+        if (a[n - 1] == b[m - 1]) {
+            ans[dp[n - 1][m - 1]] = a[n - 1];
+            n--, m--;
+        } else {
+            if (dp[n][m] == dp[n - 1][m]) n--;
+            else if (dp[n][m] == dp[n][m - 1]) m--;
+        }
+    }
+    return ans;
+}
