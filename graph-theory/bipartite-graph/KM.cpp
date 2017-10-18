@@ -6,7 +6,7 @@ template<typename T>
 T KM(vector<vector<T>>& lj) {
     int n = lj.size();  // left num
     int m = lj[0].size();  // right num
-    static vector<int> rlink; //, llink;  // left link to right, right link to left
+    static vector<int> rlink; //, llink;  // right link to left, left link to right
     //llink.resize(n), fill(llink.begin(), llink.end(), -1);
     rlink.resize(m), fill(rlink.begin(), rlink.end(), -1);
     vector<T> fl, fr;  // flag num

@@ -3,8 +3,8 @@ using namespace std;
 using LD = long double;
 const LD PI = acos(-1);
 const double eps = 0.5;
+using CLD = complex<LD>;
 namespace FFT {
-    using CLD = complex<LD>;
     void rader(vector<CLD>& y) {
         int len = y.size();
         for (int i = 1, j = len / 2; i < len - 1; i++) {

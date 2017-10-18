@@ -6,7 +6,7 @@ vector<vector<int>> tarjan(const vector<vector<int>> &lj) {
     vector<int> dfn(n), low(n), bh(n, -1);
     int ind = 1;
     int num = 0;
-    stack<int> s;
+    stack<int, vector<int>> s;
     function<void(int)> dfs = [&](int k) {
         dfn[k] = low[k] = ind++;
         s.push(k);
@@ -36,8 +36,9 @@ vector<vector<int>> tarjan(const vector<vector<int>> &lj) {
     vector<vector<int>> tiny(num);
     for (int i = 0; i < n; i++) {
         for (auto j : lj[i]) {
-            if (bh[i] != bh[j])
-                tiny[bh[i]].push_back(bh[j]);
+            if (bh[i] != bh[j]) {
+                tiny[bh[i]].push_back(bh[j]); // multiple edge
+            }
         }
     }
     return tiny;

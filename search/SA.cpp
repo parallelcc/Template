@@ -5,7 +5,7 @@ const double PI = acos(-1.0);
 double eps = 1e-8;
 
 int main() {
-    default_random_engine e(time(NULL));
+    mt19937 e(time(NULL));
     uniform_real_distribution<double> u(0.0, 1.0);
     double t = ;  // step length
     // some init val

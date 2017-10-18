@@ -39,3 +39,10 @@ T spfa(vector<vector<node>>& lj, int S, int N) {
     }
     return dis[N];
 }
+/*
+// u -> v shortest == max(u - v) == -min(v - u)
+lj[u].push_back({v, w});  // u - v <= w
+lj[i].push_back({i - 1, 1});  // (i) - (i - 1) <= 1
+lj[i - 1].push_back({i, 0});  // (i - 1) - (i) <= 0
+if (dis[N] == INF) return -2;  // -1 no solution, -2 any solution
+*/

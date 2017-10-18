@@ -16,12 +16,9 @@ class Frac {
 
  public:
      T num, den;
-     Frac(const T& t = 0, const T& s = 1) : num(t), den(s) {
-         simply();
-     }
-     double to_double() const {
-         return (double)num / den;
-     }
+     Frac(const T& t = 0, const T& s = 1) : num(t), den(s) { simply(); }
+     double to_double() const { return (double)num / den; }
+     long double to_ldouble() const { return (long double)num / den; }
      friend const Frac operator- (const Frac& t) {
          auto ans = t;
          ans.num = -ans.num;

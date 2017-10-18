@@ -44,6 +44,8 @@ class BigInt {
          if (this->sign == "-") return this->sign + this->num;
          else return this->num;
      }
+     const LL toll() { return stoll(this->to_string()); }
+     const int toi() { return stoi(this->to_string()); }
      BigInt() : num("0"), sign("+") {}
      BigInt(const int t) {
          if (t < 0) {

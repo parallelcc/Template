@@ -45,7 +45,7 @@ struct HDL {
         for (;top[u] != top[v];dep[top[u]] > dep[top[v]]?u = fa[top[u]] : v = fa[top[v]]);
         return dep[u] < dep[v]? u : v;
     }
-    vector<pair<int, int>> path(int u, int v) {
+    vector<pair<int, int>> path(int u, int v) {  // [,]
         vector<pair<int, int>> a;
         a.reserve(p.size());
         int f1 = top[u], f2 = top[v];
@@ -61,6 +61,6 @@ struct HDL {
         if (dep[u] > dep[v]) swap(u, v);
         a.emplace_back(p[u], p[v] + 1);  // point
         // if (u != v) a.emplace_back(p[u] + 1, p[v] + 1);  // edge
-        return a;
+        return a;  // [,)
     }
 };

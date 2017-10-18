@@ -2,30 +2,30 @@
 using namespace std;
 using LL = int64_t;
 
-LL PowMod(LL a, LL n, LL mod) {
-    LL ans = 1;
-    while (n) {
-        if (n & 1)
-            ans = (ans * a) % mod;
-        a = (a * a) % mod;
-        n >>= 1;
-    }
-    return ans;
-}
 namespace Cmod {
-    vector<LL> jc;
     const LL mod = 1e9 + 7;
+    vector<LL> fac, finv;
 
-    void init(LL n) {
-        jc.resize(n);
-        jc[0] = 1;
+    void init(int n) {
+        fac.resize(n);
+        finv.resize(n);
+        fac[0] = 1;
         for (int i = 1; i < n; i++) {
-            jc[i] = jc[i - 1] * i % mod;
+            fac[i] = fac[i - 1] * i % mod;
+        }
+        finv[1] = 1;
+        for (int i = 2; i < n; i++) {
+            finv[i] = finv[mod % i] * (mod - mod / i) % mod;
+        }
+        finv[0] = 1;
+        for (int i = 1; i < n; i++) {
+            finv[i] = finv[i - 1] * finv[i] % mod;
         }
     }
     LL Comb(LL n, LL m) { 
-        return jc[n] * PowMod(jc[m] * jc[n - m] % mod, mod - 2, mod) % mod;
+        return fac[n] * finv[m] % mod * finv[n - m] % mod;
     }
+
     LL Lucas(LL n, LL m) {
         LL ans = 1;
         while (n && m) {

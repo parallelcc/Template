@@ -5,7 +5,20 @@ using LD = long double;
 
 inline LL mul(LL x, LL y, LL mod) {
     return x * y % mod;
-    // return (x * y - (LL)((LD)x / mod * y) * mod) % mod;
+    // LL res = x * y - (LL)((LD)x / mod * y) * mod;
+    // if (abs(res) >= mod) res %= mod;
+    // if (res < 0) res += mod;
+    // return res;
+}
+inline LL add(LL x, LL y, LL mod) {
+    x += y;
+    if (x >= mod) x -= mod;
+    return x;
+}
+inline LL sub(LL x, LL y, LL mod) {
+    x -= y;
+    if (x < 0) x += mod;
+    return x;
 }
 LL PowMod(LL a, LL n, LL mod) {
     LL ans = 1;
@@ -32,50 +45,45 @@ T inv(T a, T mod) {  // ax = 1(mod p)
 
 class NTT {
  private:
-     vector<LL> wn;
-     void rader(vector<LL>& y) {
-         int len = y.size();
-         for (int i = 1, j = len / 2; i < len - 1; i++) {
-             if (i < j) swap(y[i], y[j]);
-             int k = len / 2;
-             while (j >= k) {
-                 j -= k;
-                 k /= 2;
-             }
-             if (j < k) j += k;
-         }
-     }
+     vector<LL> wn, inv2;
 
  public:
      LL mod;
      int g;
      NTT() {}
      NTT(LL mod, int g = 3, int k = 20) : mod(mod), g(g) {
-         wn.resize(k);
-         for (int i = 1; i < k; i++) {
-             int t = 1 << i;
-             wn[i] = PowMod(g, (mod - 1) / t, mod);
+         wn.resize(1 << k);
+         wn[0] = 1;
+         wn[1] = PowMod(g, (mod - 1) >> k, mod);
+         for (int i = 2; i < (1 << k); i++) {
+             wn[i] = mul(wn[i - 1], wn[1], mod);
+         }
+         inv2.resize(k + 1);
+         inv2[0] = 1;
+         inv2[1] = (mod + 1) >> 1;
+         for (int i = 2; i <= k; i++) {
+             inv2[i] = mul(inv2[i - 1], inv2[1], mod);
          }
      }
      void DFT(vector<LL>& y, int on) {
          int len = y.size();
-         rader(y);
-         for (int h = 2, i = 1; h <= len; h <<= 1, i++) {
-             for (int j = 0; j < len; j += h) {
-                 LL w = 1;
-                 for (int k = j; k < j + h / 2; k++) {
-                     LL u = y[k];
-                     LL t = mul(w, y[k + h / 2], mod);
-                     y[k] = (u + t) % mod;
-                     y[k + h / 2] = (u - t + mod) % mod;
-                     w = mul(w, wn[i], mod);
+         for (int i = 0, j = 0; i < len; i++) {
+             if (i > j) swap(y[i], y[j]);
+             for (int l = len >> 1; (j ^= l) < l; l >>= 1);
+         }
+         for (int i = 1, d = 1; d < len; i++, d <<= 1) {
+             for (int j = 0; j < len; j += d << 1) {
+                 for (int k = 0; k < d; k++) {
+                     LL t = mul(wn[(wn.size() >> i) * k], y[j + k + d], mod);
+                     y[j + d + k] = sub(y[j + k], t, mod);
+                     y[j + k] = add(y[j + k], t, mod);
                  }
              }
          }
          if (on == -1) {
              reverse(y.begin() + 1, y.end());
-             LL inv = PowMod(len, mod - 2, mod);
-             for (auto& i : y) i = mul(i, inv, mod);
+             LL val = inv2[__lg(len)];
+             for (auto &i : y) i = mul(i, val, mod);
          }
      }
      void conv(vector<LL>& a, vector<LL>& b) {
@@ -100,54 +108,43 @@ class NTT {
      vector<LL> pinv(vector<LL>& a, int n, LL P) {  // ax = 1 (mod x^n)(mod P)
          LL k = inv(a[0], P);
          if (k == -1) return vector<LL>();
-         function<vector<LL>(int)> inv;
+         vector<LL> b, tmp;
+         b.push_back(k);
          if (P == mod) {
-             inv = [&](size_t n) {
-                 if (n == 1) return vector<LL>{k};
-                 else {
-                     auto b = inv((n + 1) >> 1);
-                     int len = 1;
-                     while (len < n << 1) len <<= 1;
-                     b.resize(len);
-                     vector<LL> tmp(len);
-                     copy_n(a.begin(), min(n, a.size()), tmp.begin());
-                     DFT(b, 1);
-                     DFT(tmp, 1);
-                     for (int i = 0; i < len; i++) b[i] = mul(b[i], ((2 - mul(b[i], tmp[i], mod)) % mod + mod) % mod, mod);
-                     DFT(b, -1);
-                     b.resize(n);
-                     return b;
-                 }
-             };
+             for (int i = 2; (i >> 1) < n; i <<= 1) {
+                 int len = min(i, n);
+                 b.resize(i << 1);
+                 tmp.resize(i << 1);
+                 copy_n(a.begin(), len, tmp.begin());
+                 DFT(b, 1);
+                 DFT(tmp, 1);
+                 for (int j = 0; j < (i << 1); j++) b[j] = mul(b[j], sub(2, mul(b[j], tmp[j], mod), mod), mod);
+                 DFT(b, -1);
+                 b.resize(len);
+             }
          } else {
-             inv = [&](size_t n) {
-                 if (n == 1) return vector<LL>{k};
-                 else {
-                     auto b = inv((n + 1) >> 1);
-                     int len = 1;
-                     while (len < n << 1) len <<= 1;
-                     b.resize(len);
-                     vector<LL> tmp(len);
-                     copy_n(a.begin(), min(n, a.size()), tmp.begin());
-                     DFT(b, 1);
-                     DFT(tmp, 1);
-                     for (int i = 0; i < len; i++) tmp[i] = mul(b[i], tmp[i], mod);
-                     DFT(tmp, -1);
-                     for (int i = 0; i < len; i++) {
-                         tmp[i] = (tmp[i] % P + P) % P;
-                         if (tmp[i]) tmp[i] = P - tmp[i];
-                     }
-                     tmp[0] = (tmp[0] + 2) % P;
-                     DFT(tmp, 1);
-                     for (int i = 0; i < len; i++) b[i] = mul(b[i], tmp[i], mod);
-                     DFT(b, -1);
-                     for (int i = 0; i < len; i++) b[i] = (b[i] % P + P) % P;
-                     b.resize(n);
-                     return b;
+             for (int i = 2; (i >> 1) < n; i <<= 1) {
+                 int len = min(i, n);
+                 b.resize(i << 1);
+                 tmp.resize(i << 1);
+                 copy_n(a.begin(), len, tmp.begin());
+                 DFT(b, 1);
+                 DFT(tmp, 1);
+                 for (int j = 0; j < (i << 1); j++) tmp[j] = mul(b[j], tmp[j], mod);
+                 DFT(tmp, -1);
+                 for (int j = 0; j < (i << 1); j++) {
+                     tmp[j] %= P;
+                     if (tmp[j]) tmp[j] = P - tmp[j];
                  }
-             };
+                 tmp[0] = add(tmp[0], 2, P);
+                 DFT(tmp, 1);
+                 for (int j = 0; j < (i << 1); j++) b[j] = mul(b[j], tmp[j], mod);
+                 DFT(b, -1);
+                 for (int j = 0; j < (i << 1); j++) tmp[j] %= P;
+                 b.resize(len);
+             }
          }
-         return inv(n);
+         return b;
      }
      bool div(vector<LL>& a, vector<LL>& b, LL mod) {
          if (a.size() < b.size()) {
@@ -164,9 +161,10 @@ class NTT {
          reverse(c.begin(), c.end());
          conv(b, c);
          b.resize(m);
-         for (int i = 0; i < m; i++) b[i] = ((a[i] - b[i]) % mod + mod) % mod;
+         for (int i = 0; i < m; i++) b[i] = sub(a[i], b[i] % mod, mod);
          DFT(c, -1);
          c.resize(n);
+         for (int i = 0; i < n; i++) c[i] %= mod;
          a = move(c);
          return true;
      }

@@ -1,97 +1,84 @@
 // Copyright 2016 Parallelc
 #include <bits/stdc++.h>
 using namespace std;  // NOLINT
-const int MAXN = 1010;
+using T = int;
+using L = int;
 const int INF = 0x3f3f3f3f;
-typedef int T;
-typedef int L;
-struct Edge{
-    int v;
-    T cost;
-    L cap;
-    int rev;
-    Edge(int v, L cap, T cost, int rev) {
-        this->v = v;
-        this->cap = cap;
-        this->cost = cost;
-        this->rev = rev;
-    }
+class minCost {
+ private:
+     struct node{
+         int v;
+         L cap;
+         T cost;
+         int rev;
+     };
+     vector<vector<node>> lj;
+     vector<bool> vis;
+     vector<int> cnt, pre;
+     vector<T> dis;
+     bool SPFA(int start, int end) {
+         fill(dis.begin(), dis.end(), INF);
+         fill(vis.begin(), vis.end(), 0);
+         fill(cnt.begin(), cnt.end(), 0);
+         vis[start] = true;
+         dis[start] = 0;
+         queue<int> que;
+         que.push(start);
+         cnt[start] = 1;
+         pre[start] = -1;
+         while (!que.empty()) {
+             int u = que.front();
+             que.pop();
+             vis[u] = false;
+             for (auto& i : lj[u]) {
+                 if (i.cap && dis[i.v] > dis[u] + i.cost) {
+                     dis[i.v] = dis[u] + i.cost;
+                     pre[i.v] = i.rev;
+                     if (!vis[i.v]) {
+                         vis[i.v] = true;
+                         que.push(i.v);
+                         if (++cnt[i.v] > n) return false;
+                     }
+                 }
+             }
+         }
+         // if (dis[end] >= 0) return false; // not maxFlow
+         if (dis[end] == INF) return false;
+         return true;
+     }
+
+ public:
+     int n;
+     minCost() {}
+     minCost(int n) : n(n) {
+         lj.resize(n);
+         vis.resize(n);
+         cnt.resize(n);
+         dis.resize(n);
+         pre.resize(n);
+     }
+     void add(int u, int v, L w, T c) {
+         lj[u].push_back({v, w, c, lj[v].size()});
+         lj[v].push_back({u, 0, -c, lj[u].size() - 1});
+     }
+     pair<L, T> solve(int s, int t) {
+         L flow = 0;
+         T cost = 0;
+         while (SPFA(s, t)) {
+             L Min = INF;
+             for (int i = t; pre[i] != -1; i = lj[i][pre[i]].v) {
+                 auto& j = lj[i][pre[i]];
+                 Min = min(Min, lj[j.v][j.rev].cap);
+             }
+             for (int i = t; pre[i] != -1; i = lj[i][pre[i]].v) {
+                 auto& j = lj[i][pre[i]];
+                 auto& k = lj[j.v][j.rev];
+                 k.cap -= Min;
+                 j.cap += Min;
+             }
+             cost += dis[t] * Min;
+             flow += Min;
+         }
+         return {flow, cost};
+     }
 };
-vector<Edge> E[MAXN];
-bool vis[MAXN];
-int cnt[MAXN];
-T dist[MAXN];
-pair<int, int> pre[MAXN];
-int n, m;
-bool SPFA(int start, int end) {
-    fill(dist, dist + n + 1, INF);
-    fill(vis, vis + n + 1, 0);
-    fill(cnt, cnt + n + 1, 0);
-    vis[start] = true;
-    dist[start] = 0;
-    queue<int> que;
-    que.push(start);
-    cnt[start] = 1;
-    pre[start] = make_pair(-1, 0);
-    while (!que.empty()) {
-        int u = que.front();
-        que.pop();
-        vis[u] = false;
-        for (int i = 0; i < E[u].size(); i++) {
-            int v = E[u][i].v;
-            if (E[u][i].cap && dist[v] > dist[u] + E[u][i].cost) {
-                dist[v] = dist[u] + E[u][i].cost;
-                pre[v] = make_pair(u, i);
-                if (!vis[v]) {
-                    vis[v] = true;
-                    que.push(v);
-                    if (++cnt[v] > n) return false;
-                }
-            }
-        }
-    }
-    if (dist[end] == INF) return false;
-    return true;
-}
-L minCostMaxflow(int s, int t, T &cost) {
-    L flow = 0;
-    cost = 0;
-    while (SPFA(s, t)) {
-        L Min = INF;
-        for (int i = t; pre[i].first != -1; i = pre[i].first) {
-            if (Min > E[pre[i].first][pre[i].second].cap) {
-                Min = E[pre[i].first][pre[i].second].cap;
-            }
-        }
-        for (int i = t; pre[i].first != -1; i = pre[i].first) {
-            Edge &k = E[pre[i].first][pre[i].second];
-            k.cap -= Min;
-            E[i][k.rev].cap += Min;
-            cost += k.cost * Min;
-        }
-        flow += Min;
-    }
-    return flow;
-}
-int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0);
-    while (cin >> n >> m) {
-        int S, N;
-        S = 1;
-        N = n;
-        for (int i = 0; i < n + 1; i++) E[i].clear();
-        for (int i = 0; i < m; i++) {
-            int u, v;
-            L w;
-            T c;
-            cin >> u >> v >> w >> c;
-            E[u].push_back(Edge(v, w, c, E[v].size()));
-            E[v].push_back(Edge(u, 0, -c, E[u].size() - 1));
-        }
-        T cost;
-        L flow = minCostMaxflow(S, N, cost);
-        cout << flow << ' ' << cost << '\n';
-    }
-    return 0;
-}

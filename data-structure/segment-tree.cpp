@@ -10,7 +10,7 @@ class SegTree {
          T v, lazy = 0;
          node() {}
          node(int l, int r, T v) : l(l), r(r), v(v) {}
-         void mod(int k) {  // mutable
+         void mod(T k) {  // mutable
              v += k * (r - l);
              lazy += k;
          }
@@ -25,7 +25,7 @@ class SegTree {
 
  public:
      SegTree() {}
-     SegTree(int n) : SegTree(vector<int>(n)) {}
+     SegTree(int n) : SegTree(vector<T>(n, identity_element(op()))) {}
      SegTree(const vector<T>& a) {
          int n = a.size();
          tr.resize(4 * n);
@@ -41,7 +41,7 @@ class SegTree {
          cre(0, n, 0);
      }
      void upd(int l, int r, T tag, int now = 0) {
-         if (tr[now].r <= l || tr[now].l >= r) return;
+         if (l >= r || tr[now].r <= l || tr[now].l >= r) return;
          else if (tr[now].r <= r && tr[now].l >= l) tr[now].mod(tag);
          else {
              pd(now);
@@ -51,11 +51,24 @@ class SegTree {
          }
      }
      T que(int l, int r, int now = 0) {
-         if (tr[now].r <= l || tr[now].l >= r) return identity_element(op());
+         if (l >= r || tr[now].r <= l || tr[now].l >= r) return identity_element(op());
          else if (tr[now].r <= r && tr[now].l >= l) return tr[now].v;
          else {
              pd(now);
              return op()(que(l, r, now * 2 + 1), que(l, r, now * 2 + 2));
          }
      }
+};
+
+const int INF = 0x3f3f3f3f;
+template<typename T>
+struct Max {
+    T operator()(const T& a, const T& b) const { return max(a, b); }
+    friend T identity_element(const Max& s) { return -INF; }
+};
+
+template<typename T>
+struct Min {
+    T operator()(const T& a, const T& b) const { return min(a, b); }
+    friend T identity_element(const Min& s) { return INF; }
 };

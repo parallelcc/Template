@@ -1,23 +1,25 @@
 // h(x) <= h*(x)
-// --h(x) - h(x + 1) <= g(x + 1) - g(x)
 #include <bits/stdc++.h>
 using namespace std;
 using Status = int;
 using T = int;
 const T INF = 0x3f3f3f3f;
+unordered_map<Status, T> h;
 struct node {
     Status x;
     // value
-    T f, g, h;
-    bool operator<(const node &a) const { return f > a.f; }
+    T f, g;
+    bool operator< (const node &a) const { return f > a.f; }
     void update() {  // update f
-        h = ;
-        f = g + h;
+        if (h.find(x) == h.end()) h[x] = ;
+        f = g + h[x];
     }
 };
-T Astar(Status S, Status N) {  // n nodes, from S to N
-    unordered_set<Status> us;    // if in close or not
-    unordered_map<Status, T> a;  // node's f in open or close
+// ???
+// Status encode() { return hash ??? }
+// void decode(Status) { get ??? by Status }
+T Astar(Status S, Status N) {  // n status, from S to N
+    unordered_map<Status, T> a;  // status's f
     // start
     node now;  // current node
     now.x = S;
@@ -30,24 +32,24 @@ T Astar(Status S, Status N) {  // n nodes, from S to N
         do {
             now = q.top();
             q.pop();
-        } while (!q.empty() && us.find(now.x) != us.end());
-        if (us.find(now.x) == us.end()) {
-            us.insert(now.x);
-            if (now.x == N)
-                break;
+        } while (now.f > a[now.x] && !q.empty());
+        if (now.x == N) break;
+        if (now.f == a[now.x]) {
+            // decode(now.x);
             for () {
+                // change ???
                 node tmp;  // new node
-                tmp.x = ;
+                tmp.x = ;  // encode();
                 tmp.g = now.g + ;
                 tmp.update();
                 if (a.find(tmp.x) == a.end() || a[tmp.x] > tmp.f) {
                     a[tmp.x] = tmp.f;
                     q.push(tmp);
-                    us.erase(tmp.x);
                 }
+                // restore ???
             }
         }
     }
-    if (us.find(N) != us.end()) return a[N];
+    if (a.find(N) != a.end()) return a[N];
     else return INF;
 }
