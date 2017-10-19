@@ -1,7 +1,6 @@
 /*
  * 二维ACM计算几何模板
  * 注意变量类型更改和EPS
- * By OWenT
  */
 
 #include <bits/stdc++.h>

@@ -1,37 +1,30 @@
 import java.io.*;
-
 import java.math.*;
-
 import java.util.*;
 
-import java.text.*;
-
-public class Main
-
-{
-
-	public static void main(String[] args)
-
-	{
-
-		Scanner cin = new Scanner (new BufferedInputStream(System.in));
-		
-		int t=1;
-
-		while(true)
-		
-		{
-			
-
-			BigInteger x, y, z;
-
-			x = cin.nextBigInteger();
-
-			if(x%73==0||x%137==0) System.out.println("Case #"+t+":YES");
-else System.out.println("Case #"+t+":NO");
-	
-		}
-
-	}
-
+public class Main {
+    public static void main(String[] args) {
+        Scanner cin = new Scanner(new BufferedInputStream(System.in));
+        while(cin.hasNext()) {
+            BigInteger x, y;
+            x = cin.nextBigInteger();
+            y = cin.nextBigInteger();
+            x = x.add(BigInteger.ONE); x = x.subtract(BigInteger.TEN);
+            x = x.multiply(BigInteger.ZERO);
+            x = x.divide(y); x = x.remainder(y); x = x.mod(y);
+            x = x.pow(10); x = x.gcd(y); x = x.abs(); x = x.negate();
+            x = x.max(y); x = x.min(y);
+            if (x.compareTo(y) > 0) { }
+            if (x.equals(y)) { }
+            x = new BigInteger("123456");
+            x = new BigInteger("1010101", 2);
+            x.toString();
+            System.out.println(x);
+            BigDecimal a, b;
+            a = cin.nextBigDecimal();
+            b = cin.nextBigDecimal();
+            a = a.divide(b, 100, RoundingMode.HALF_UP);
+            System.out.println(String.format("%.6f", a));
+        }
+    }
 }

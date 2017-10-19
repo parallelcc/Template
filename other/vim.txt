@@ -1,0 +1,14 @@
+syntax on
+set cin
+set nu
+set ts=4
+set sw=4
+set et
+set sta
+set cino=g1
+map<C-T> :call Run()<CR>
+func! Run()
+exec "w"
+exec "!g++ -O2 -Wall -std=c++11 % -o %<"
+exec "!./%<"
+endfunc
