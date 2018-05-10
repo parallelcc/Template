@@ -589,16 +589,10 @@ class triangle
      //返回：外接圆圆心
      point circumcenter()
      {
-         pVector u,v;
-         u.s.x = (a.x + b.x) / 2;
-         u.s.y = (a.y + b.y) / 2;
-         u.e.x = u.s.x - a.y + b.y;
-         u.e.y = u.s.y + a.x - b.x;
-         v.s.x = (a.x + c.x) / 2;
-         v.s.y = (a.y + c.y) / 2;
-         v.e.x = v.s.x - a.y + c.y;
-         v.e.y = v.s.y + a.x - c.x;
-         return u.crossLPt(v);
+         double a1 = b.x - a.x, b1 = b.y - a.y, c1 = (a1 * a1 + b1 * b1) / 2;
+         double a2 = c.x - a.x, b2 = c.y - a.y, c2 = (a2 * a2 + b2 * b2) / 2;
+         double d = a1 * b2 - a2 * b1;
+         return point(a.x + (c1 * b2 - c2 * b1) / d, a.y + (a1 * c2 - a2 * c1) / d);
      }
 
      //计算三角形内心

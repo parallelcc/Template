@@ -51,7 +51,7 @@ class Treap : public null_tag {
     virtual void pu(int now) { tr[now].size = 1 + tr[tr[now].l].size + tr[tr[now].r].size; }
     // if join after split, needn't copy
     int join(int A, int B) {
-        if (!A && !B) return 0; if (!A) return copy(B); if (!B) return copy(A);
+        if (!A) return B; if (!B) return A;
         if (tr[A].v < tr[B].v) {
             A = copy(A); pd(A); tr[A].r = join(tr[A].r, B); pu(A); return A;
         } else {
@@ -75,6 +75,17 @@ class Treap : public null_tag {
  public:
     Treap() {}
     size_t size() { return tr[getr()].size; }
+    void build(vector<T>& a) {
+        stack<int, vector<int>> s;
+        for (auto i : a) {
+            int x = newnode(i);
+            while (!s.empty() && tr[s.top()].v > tr[x].v) pu(s.top()), s.pop();
+            if (s.empty()) tr[x].l = getr(), setr(x);
+            else tr[x].l = tr[s.top()].r, tr[s.top()].r = x;
+            s.push(x);
+        }
+        while (!s.empty()) pu(s.top()), s.pop();
+    }
     T find_by_order(int k) {
         int x = getr();
         while (tr[tr[x].l].size != k) {
@@ -264,17 +275,6 @@ class RgeTrp : public Treap {
     RgeTrp& join(RgeTrp&& x) { setr(join(getr(), x.getr())); return *this; }
     RgeTrp& split(int k) { setr(split_by_order(getr(), k).first); return *this; }
     RgeTrp& split(int k, RgeTrp& x) { auto r = split_by_order(getr(), k); setr(r.first); x.setr(r.second); return *this;}
-    void build(vector<T>& a) {
-        stack<int, vector<int>> s;
-        for (auto i : a) {
-            int x = newnode(i);
-            while (!s.empty() && tr[s.top()].v > tr[x].v) pu(s.top()), s.pop();
-            if (s.empty()) tr[x].l = getr(), setr(x);
-            else tr[x].l = tr[s.top()].r, tr[s.top()].r = x;
-            s.push(x);
-        }
-        while (!s.empty()) pu(s.top()), s.pop();
-    }
     int insert(int pos, T k) { int r = getr(); int res = insert(r, pos, k, rd()); setr(r); return res; }
     void insert(int pos, RgeTrp& k) { RgeTrp x; this->split(pos, x).join(k).join(x); }
     void insert(int pos, RgeTrp&& k) { RgeTrp x; this->split(pos, x).join(k).join(x); }

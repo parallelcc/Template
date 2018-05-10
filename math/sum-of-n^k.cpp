@@ -18,6 +18,7 @@ inline LL sub(LL x, LL y, LL mod) {
 }
 inline LL mul(LL x, LL y, LL mod) {
     // return x * y % mod;
+    // x %= mod; y %= mod;  // !!!
     LL res = x * y - (LL)((LD)x / mod * y) * mod;
     if (abs(res) >= mod) res %= mod;
     if (res < 0) res += mod;

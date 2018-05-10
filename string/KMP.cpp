@@ -43,7 +43,7 @@ class KMP {
                  i++;
                  j++;
                  if (j == sub_len) {
-                    return i - sub_len + 1;
+                    return i - sub_len;
                     j = nex[j];
                  }
              } else {

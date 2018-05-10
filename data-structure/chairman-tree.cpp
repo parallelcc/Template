@@ -106,3 +106,5 @@ class ChaTree : public PerTree<> {
         return que(r, 0, k) - que(l, 0, k);
     }
 };
+
+// cur = 0;

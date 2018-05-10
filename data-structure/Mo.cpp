@@ -18,7 +18,7 @@ int main() {
         return s.l < e.l;
     });
     vector<T> ans(q);
-    int l = 0, r = 0;
+    int l = que[0].l, r = que[0].l;
     for (auto& i : que) {
         for (; r < i.r; r++) upd(r, 1);
         for (; r > i.r; r--) upd(r - 1, -1);

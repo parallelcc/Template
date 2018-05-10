@@ -1,8 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int mod = 1e9 + 7;
+using LL = int64_t;
+const LL mod = 1e9 + 7;
 const int N = 1005;
-int S[N][N];
+LL S[N][N];
 // divide i to j circles
 void init1() {
     for (int i = 0; i < N; i++) {

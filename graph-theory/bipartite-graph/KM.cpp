@@ -3,7 +3,7 @@
 using namespace std;  // NOLINT
 const int INF = 0x3f3f3f3f;
 template<typename T>
-T KM(vector<vector<T>>& lj) {
+T KM(vector<vector<T>>& lj) {  // n <= m && perfect matching
     int n = lj.size();  // left num
     int m = lj[0].size();  // right num
     static vector<int> rlink; //, llink;  // right link to left, left link to right
@@ -58,8 +58,8 @@ T KM(vector<vector<T>>& lj) {
         }
     }
     T res = 0;
-    for (int i = 0; i < n; i++) {
-        res += lj[rlink[i]][i];
+    for (int i = 0; i < m; i++) {
+        if (rlink[i] != -1) res += lj[rlink[i]][i];
     }
     return res;
 }
