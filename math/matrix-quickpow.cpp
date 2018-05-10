@@ -27,7 +27,7 @@ struct Mat {
         Mat ans(t.n);
         for (int i = 0; i < ans.n; i++) {
             for (int k = 0; k < ans.n; k++) {
-                if (ans.val[i][k]) {
+                if (t.val[i][k]) {
                     for (int j = 0; j < ans.n; j++) {
                         ans.val[i][j] += t.val[i][k] * s.val[k][j] % mod;
                         if (ans.val[i][j] >= mod) ans.val[i][j] -= mod;
