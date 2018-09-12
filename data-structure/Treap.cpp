@@ -239,7 +239,7 @@ class RgeTrp : public Treap {
             tie(tr[y].l, tr[y].r) = split_by_order(x, pos); x = y;
         } else {
             x = copy(x); pd(x);
-            if (tr[tr[x].l].size > pos) y = insert(tr[x].l, pos, k, v);
+            if (tr[tr[x].l].size >= pos) y = insert(tr[x].l, pos, k, v);
             else { pos -= tr[tr[x].l].size + 1; y = insert(tr[x].r, pos, k, v); }
         }
         pu(x); return y;

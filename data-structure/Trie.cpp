@@ -1,12 +1,18 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+const int TB = 26;
+const char init = 'a';
+
+using sz = uint32_t;
+
 struct node {
-    int l, r, num;
+    sz size, num;
+    int nxt[TB];
 };
 
-const int N = 100005;
-node tr[33 * N];
+const int N = 1000005;
+node tr[N];
 int cur = 1;
 
 class null_tag { 
@@ -31,170 +37,89 @@ class pers_tag {
      inline void back(int x) { if (x >= root.size()) return; tim = x; }
 };
 
-template <typename T, class tag = null_tag>
+template <class tag = null_tag>
 class Trie : public tag {
     using tag::tag;
     using tag::getr;
     using tag::setr;
     using tag::copy;
  private:
-     int newnode() { tr[cur].l = tr[cur].r = tr[cur].num = 0; return cur++; }
-     static int join(int u, int v) {
-         if (!u) return v;
-         if (!v) return u;
-         u = copy(u);
-         tr[u].num += tr[v].num;
-         tr[u].l = join(tr[u].l, tr[v].l);
-         tr[u].r = join(tr[u].r, tr[v].r);
-         return u;
-     }
+    int newnode() {
+        memset(tr[cur].nxt, 0, sizeof(tr[cur].nxt)); // if single case, don't need
+        tr[cur].size = tr[cur].num = 0; return cur++;
+    }
+    int join(int u, int v) {
+        if (!u) return v;
+        if (!v) return u;
+        u = copy(u);
+        tr[u].num += tr[v].num; tr[u].size = tr[u].num;
+        for (int i = 0; i < TB; i++) {
+            tr[u].nxt[i] = join(tr[u].nxt[i], tr[v].nxt[i]);
+            tr[u].size += tr[tr[u].nxt[i]].size;
+        }
+        return u;
+    }
+    void do_erase(string& s, sz num) {
+        int x = copy(getr()); setr(x);
+        for (auto i : s) {
+            tr[x].size -= num;
+            x = tr[x].nxt[i - init] = copy(tr[x].nxt[i - init]);
+        }
+        tr[x].size -= num; tr[x].num -= num;
+    }
 
  public:
-     Trie() {}
-     Trie& join(Trie& x) { setr(join(getr(), x.getr())); x.setr(0); return *this; }
-     Trie& join(Trie&& x) { setr(join(getr(), x.getr())); return *this; }
-     size_t size() { return tr[getr()].num; }
-     bool empty() { return size() == 0; }
-     void insert(T v) {
-         int x = copy(getr()); setr(x);
-         for (int i = (sizeof(T) << 3) - 1; i >= 0; i--) {
-             tr[x].num++;
-             if (v >> i & 1) {
-                 if (!tr[x].r) tr[x].r = newnode();
-                 else tr[x].r = copy(tr[x].r);
-                 x = tr[x].r;
-             } else {
-                 if (!tr[x].l) tr[x].l = newnode();
-                 else tr[x].l = copy(tr[x].l);
-                 x = tr[x].l;
-             }
-         }
-         tr[x].num++;
-     }
-     bool erase(T v) {
-         // if (!find(v)) return false;
-         int x = copy(getr()); setr(x);
-         for (int i = (sizeof(T) << 3) - 1; i >= 0; i--) {
-             tr[x].num--;
-             if (v >> i & 1) x = tr[x].r = copy(tr[x].r);
-             else x = tr[x].l = copy(tr[x].l);
-         }
-         tr[x].num--;
-         return true;
-     }
-     bool find(T v) {
-         int x = getr();
-         for (int i = (sizeof(T) << 3) - 1; i >= 0; i--) {
-             if (v >> i & 1) x = tr[x].r;
-             else x = tr[x].l;
-             if (!tr[x].num) return false;
-         }
-         return true;
-     }
-     T Max(T v = 0) {
-         if (empty()) return v;
-         int x = getr();
-         for (int i = (sizeof(T) << 3) - 1; i >= 0; i--) {
-             if (v >> i & 1) {
-                 if (tr[tr[x].l].num) x = tr[x].l;
-                 else x = tr[x].r, v ^= T(1) << i;
-             } else {
-                 if (tr[tr[x].r].num) x = tr[x].r, v ^= T(1) << i;
-                 else x = tr[x].l;
-             }
-         }
-         return v;
-     }
-     T Min(T v = 0) {
-         if (empty()) return v;
-         int x = getr();
-         for (int i = (sizeof(T) << 3) - 1; i >= 0; i--) {
-             if (v >> i & 1) {
-                 if (tr[tr[x].r].num) x = tr[x].r, v ^= T(1) << i;
-                 else x = tr[x].l;
-             } else {
-                 if (tr[tr[x].l].num) x = tr[x].l;
-                 else x = tr[x].r, v ^= T(1) << i;
-             }
-         }
-         return v;
-     }
-     T find_by_order(int k) {
-         if (empty()) return -1;
-         k = min(k, size() - 1);
-         int x = getr(); T v = 0;
-         for (int i = (sizeof(T) << 3) - 1; i >= 0; i--) {
-             if (tr[tr[x].l].num > k) x = tr[x].l;
-             else k -= tr[tr[x].l].num, x = tr[x].r, v ^= T(1) << i;
-         }
-         return v;
-     }
-     int order_of_key(T v) {
-         int x = getr(), k = 0;
-         for (int i = (sizeof(T) << 3) - 1; i >= 0; i--) {
-             if (v >> i & 1) k += tr[tr[x].l].num, x = tr[x].r;
-             else x = tr[x].l;
-         }
-         return k;
-     }
-};
-
-template <typename T>
-class PerTrie : public Trie<T, pers_tag> {
-    using Trie<T, pers_tag>::Trie;
-    using Trie<T, pers_tag>::root;
- public:
-    T Max(int L, int R, T v = 0) {
-        if (L >= R || R >= root.size()) return v;
-        L = root[L], R = root[R];
-        if (!(tr[R].num - tr[L].num)) return v;
-        for (int i = (sizeof(T) << 3) - 1; i >= 0; i--) {
-            if (v >> i & 1) {
-                if (tr[tr[R].l].num - tr[tr[L].l].num) L = tr[L].l, R = tr[R].l;
-                else L = tr[L].r, R = tr[R].r, v ^= T(1) << i;
-            } else {
-                if (tr[tr[R].r].num - tr[tr[L].r].num) L = tr[L].r, R = tr[R].r, v ^= T(1) << i;
-                else L = tr[L].l, R = tr[R].l;
+    Trie() {}
+    Trie& join(Trie& x) { setr(join(getr(), x.getr())); x.setr(0); return *this; }
+    Trie& join(Trie&& x) { setr(join(getr(), x.getr())); return *this; }
+    sz size() { return tr[getr()].size; }
+    bool empty() { return size() == 0; }
+    void insert(string& s, sz num = 1) {
+        int r = getr(), x;
+        if (!r) x = newnode();
+        else x = copy(r);
+        setr(x);
+        for (auto i : s) {
+            tr[x].size += num;
+            int& y = tr[x].nxt[i - init];
+            if (!y) y = newnode();
+            else y = copy(y);
+            x = y;
+        }
+        tr[x].num += num; tr[x].size += num;
+    }
+    bool erase(string& s, sz num = 1) { num = min(num, find(s)); if (num > 0) { do_erase(s, num); return true; } else return false; }
+    bool erase_all(string& s) { sz num = find(s); if (num > 0) { do_erase(s, num); return true; } else return false; }
+    bool erase_pre(string& s) {
+        sz num = find_pre(s);
+        if (num) {
+            int x = copy(getr()); setr(x);
+            for (int i = 0; i < (int)s.length() - 1; i++) {
+                tr[x].size -= num;
+                x = tr[x].nxt[s[i] - init] = copy(tr[x].nxt[s[i] - init]);
             }
+            tr[x].size -= num; tr[x].nxt[s.back() - init] = 0;
+            return true;
         }
-        return v;
+        return false;
     }
-    T Min(int L, int R, T v = 0) {
-        if (L >= R || R >= root.size()) return v;
-        L = root[L], R = root[R];
-        if (!(tr[R].num - tr[L].num)) return v;
-        for (int i = (sizeof(T) << 3) - 1; i >= 0; i--) {
-            if (v >> i & 1) {
-                if (tr[tr[R].r].num - tr[tr[L].r].num) L = tr[L].r, R = tr[R].r, v ^= T(1) << i;
-                else L = tr[L].l, R = tr[R].l;
-            } else {
-                if (tr[tr[R].l].num - tr[tr[L].l].num) L = tr[L].l, R = tr[R].l;
-                else L = tr[L].r, R = tr[R].r, v ^= T(1) << i;
-            }
+    sz find(string& s) {
+        if (empty()) return 0;
+        int x = getr();
+        for (auto i : s) {
+            x = tr[x].nxt[i - init];
+            if (!tr[x].size) return 0;
         }
-        return v;
+        return tr[x].num;
     }
-    T find_by_order(int L, int R, int k) {
-        if (L >= R || R >= root.size()) return -1;
-        L = root[L], R = root[R];
-        if (!(tr[R].num - tr[L].num)) return -1;
-        k = min(k, tr[R].num - tr[L].num - 1);
-        T v = 0;
-        for (int i = (sizeof(T) << 3) - 1; i >= 0; i--) {
-            if (tr[tr[R].l].num - tr[tr[L].l].num > k) L = tr[L].l, R = tr[R].l;
-            else k -= tr[tr[R].l].num - tr[tr[L].l].num, L = tr[L].r, R = tr[R].r, v ^= T(1) << i;
+    sz find_pre(string& s) {
+        if (empty()) return 0;
+        int x = getr();
+        for (auto i : s) {
+            x = tr[x].nxt[i - init];
+            if (!tr[x].size) return 0;
         }
-        return v;
-    }
-    int order_of_key(int L, int R, T v) {
-        if (L >= R || R >= root.size()) return -1;
-        L = root[L], R = root[R];
-        int k = 0;
-        for (int i = (sizeof(T) << 3) - 1; i >= 0; i--) {
-            if (v >> i & 1) k += tr[tr[R].l].num - tr[tr[L].l].num, L = tr[L].r, R = tr[R].r;
-            else L = tr[L].l, R = tr[R].l;
-        }
-        return k;
+        return tr[x].size;
     }
 };
 // cur = 1;

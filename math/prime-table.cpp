@@ -2,22 +2,27 @@
 #include <bits/stdc++.h>
 using namespace std; // NOLINT
 using LL = int64_t;
-vector<int> prime, pd, u;
+vector<int> prime, pd, u, phi;
 void db(int n) {
     pd.resize(n);
-    u.resize(n);
     prime.reserve(n);
-    u[1] = 1;
+    u.resize(n); phi.resize(n);
+    u[1] = 1; phi[1] = 1;
     for (int i = 2; i < n; i++) {
         if (pd[i] == 0) {
             prime.push_back(i);
-            u[i] = -1;
+            u[i] = -1; phi[i] = i - 1;
         }
         for (auto j : prime) {
             if (i * j >= n) break;
             pd[i * j] = 1;
-            if (i % j) u[i * j] = -u[i];
-            else break;
+            if (!(i % j)) {
+                phi[i * j] = phi[i] * j;
+                break;
+            } else {
+                u[i * j] = -u[i];
+                phi[i * j] = phi[i] * (j - 1);
+            }
         }
     }
 }
