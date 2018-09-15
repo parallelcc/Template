@@ -6,32 +6,39 @@ struct node {
     int v;
     T w;
 };
-struct HDL {
-    vector<int> fa, son, top, dep, num, p, fp;
-    vector<T> bq, dis;
-    HDL(vector<vector<node>>& lj, int r) {
+class HDL {
+  private:
+    vector<pair<int, int>> a;
+
+  public:
+    static const int MAXN = 100005;
+    int fa[MAXN], son[MAXN], top[MAXN], dep[MAXN], num[MAXN], p[MAXN];
+    //static int fp[MAXN];
+    HDL(vector<vector<node>>& lj, int r/*, vector<T>& bq, vector<T>& dis*/) {
         int n = lj.size();
         int pos = 0;
-        fa.resize(n), son.resize(n, -1), top.resize(n), dep.resize(n);
-        num.resize(n), p.resize(n), fp.resize(n), bq.resize(n);
+        dep[r] = 0;
+        memset(son, -1, sizeof(int) * n);
+        a.reserve(n);
         function<void(int, int)> dfs = [&](int k, int pre) {
             fa[k] = pre;
             dep[k] = dep[pre] + 1;
             num[k] = 1;
             for (auto& i : lj[k]) {
                 if (i.v != pre) {
+                    //dis[i.v] = dis[k] + i.w;
                     dfs(i.v, k);
                     num[k] += num[i.v];
                     if (son[k] == -1 || num[i.v] > num[son[k]]) son[k] = i.v;
                 } else {
-                    bq[i.v] = i.w;
+                    //bq[i.v] = i.w;
                 }
             }
         };
         function<void(int, int)> getpos = [&](int k, int t) {
             top[k] = t;
             p[k] = pos++;
-            fp[p[k]] = k;
+            //fp[p[k]] = k;
             if (son[k] == -1) return;
             getpos(son[k], t);
             for (auto& i : lj[k]) {
@@ -42,12 +49,11 @@ struct HDL {
         getpos(r, r);
     }
     int LCA(int u, int v) {
-        for (;top[u] != top[v];dep[top[u]] > dep[top[v]]?u = fa[top[u]] : v = fa[top[v]]);
+        for (; top[u] != top[v]; dep[top[u]] > dep[top[v]]?u = fa[top[u]] : v = fa[top[v]]);
         return dep[u] < dep[v]? u : v;
     }
-    vector<pair<int, int>> path(int u, int v) {  // [,]
-        vector<pair<int, int>> a;
-        a.reserve(p.size());
+    const vector<pair<int, int>>& path(int u, int v) {  // [,]
+        a.clear();
         int f1 = top[u], f2 = top[v];
         while (f1 != f2) {
             if (dep[f1] < dep[f2]) {
