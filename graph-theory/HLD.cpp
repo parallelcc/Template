@@ -2,71 +2,76 @@
 using namespace std;
 using T = int;
 
-struct node {
+struct edge {
     int v;
     T w;
 };
+template <size_t N = 100005>
 class HDL {
   private:
+    struct node {
+        int fa, son, top, dep, num, p;
+    };
     vector<pair<int, int>> a;
 
   public:
-    static const int MAXN = 100005;
-    int fa[MAXN], son[MAXN], top[MAXN], dep[MAXN], num[MAXN], p[MAXN];
-    //static int fp[MAXN];
-    HDL(vector<vector<node>>& lj, int r/*, vector<T>& bq, vector<T>& dis*/) {
+    static node tr[N];
+    //static int fp[N];
+    HDL(vector<vector<edge>>& lj, int r/*, vector<T>& bq, vector<T>& dis*/) {
         int n = lj.size();
         int pos = 0;
-        dep[r] = 0;
-        memset(son, -1, sizeof(int) * n);
+        tr[r].dep = 0;
+        for (int i = 0; i < n; i++) tr[i].son = -1;
         a.reserve(n);
         function<void(int, int)> dfs = [&](int k, int pre) {
-            fa[k] = pre;
-            dep[k] = dep[pre] + 1;
-            num[k] = 1;
+            tr[k].fa = pre;
+            tr[k].dep = tr[pre].dep + 1;
+            tr[k].num = 1;
             for (auto& i : lj[k]) {
                 if (i.v != pre) {
                     //dis[i.v] = dis[k] + i.w;
                     dfs(i.v, k);
-                    num[k] += num[i.v];
-                    if (son[k] == -1 || num[i.v] > num[son[k]]) son[k] = i.v;
+                    tr[k].num += tr[i.v].num;
+                    if (tr[k].son == -1 || tr[i.v].num > tr[tr[k].son].num) tr[k].son = i.v;
                 } else {
                     //bq[i.v] = i.w;
                 }
             }
         };
         function<void(int, int)> getpos = [&](int k, int t) {
-            top[k] = t;
-            p[k] = pos++;
-            //fp[p[k]] = k;
-            if (son[k] == -1) return;
-            getpos(son[k], t);
+            tr[k].top = t;
+            tr[k].p = pos++;
+            //fp[tr[k].p] = k;
+            if (tr[k].son == -1) return;
+            getpos(tr[k].son, t);
             for (auto& i : lj[k]) {
-                if (i.v != son[k] && i.v != fa[k]) getpos(i.v, i.v);
+                if (i.v != tr[k].son && i.v != tr[k].fa) getpos(i.v, i.v);
             }
         };
         dfs(r, r);
         getpos(r, r);
     }
     int LCA(int u, int v) {
-        for (; top[u] != top[v]; dep[top[u]] > dep[top[v]]?u = fa[top[u]] : v = fa[top[v]]);
-        return dep[u] < dep[v]? u : v;
+        for (; tr[u].top != tr[v].top; tr[tr[u].top].dep > tr[tr[v].top].dep?u = tr[tr[u].top].fa : v = tr[tr[v].top].fa);
+        return tr[u].dep < tr[v].dep? u : v;
     }
     const vector<pair<int, int>>& path(int u, int v) {  // [,]
         a.clear();
-        int f1 = top[u], f2 = top[v];
+        int f1 = tr[u].top, f2 = tr[v].top;
         while (f1 != f2) {
-            if (dep[f1] < dep[f2]) {
+            if (tr[f1].dep < tr[f2].dep) {
                 swap(f1, f2);
                 swap(u, v);
             }
-            a.emplace_back(p[f1], p[u] + 1);
-            u = fa[f1];
-            f1 = top[u];
+            a.emplace_back(tr[f1].p, tr[u].p + 1);
+            u = tr[f1].fa;
+            f1 = tr[u].top;
         }
-        if (dep[u] > dep[v]) swap(u, v);
-        a.emplace_back(p[u], p[v] + 1);  // point
-        // if (u != v) a.emplace_back(p[u] + 1, p[v] + 1);  // edge
+        if (tr[u].dep > tr[v].dep) swap(u, v);
+        a.emplace_back(tr[u].p, tr[v].p + 1);  // point
+        // if (u != v) a.emplace_back(tr[u].p + 1, tr[v].p + 1);  // edge
         return a;  // [,)
     }
 };
+template<size_t N> struct HDL<N>::node HDL<N>::tr[N];
+//template<size_t N> int HDL<N>::fp[N];

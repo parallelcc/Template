@@ -2,7 +2,7 @@
 #include <ext/numeric>
 using namespace std;
 using namespace __gnu_cxx;
-template <typename T, class op = plus<T>>
+template <typename T, size_t N = 100005, class op = plus<T>>
 class SegTree {
  private:
      struct node {
@@ -10,25 +10,24 @@ class SegTree {
          T v, lazy = 0;
          node() {}
          node(int l, int r, T v) : l(l), r(r), v(v) {}
-         void mod(T k) {  // mutable
-             v += k * (r - l);
-             lazy += k;
-         }
      };
-     vector<node> tr;
-     void pd(int now) {
-         if (!tr[now].lazy) return;
-         tr[now * 2 + 1].mod(tr[now].lazy);
-         tr[now * 2 + 2].mod(tr[now].lazy);
-         tr[now].lazy = 0;
+     static node tr[4 * N];
+     inline void mod(int now, T k) {  // mutable
+         tr[now].v += k * (tr[now].r - tr[now].l);
+         tr[now].lazy += k;
+     }
+     inline void pd(int now) {
+         if (tr[now].lazy) {
+            mod(now * 2 + 1, tr[now].lazy);
+            mod(now * 2 + 2, tr[now].lazy);
+            tr[now].lazy = 0;
+         }
      }
 
  public:
      SegTree() {}
      SegTree(int n) : SegTree(vector<T>(n, identity_element(op()))) {}
      SegTree(const vector<T>& a) {
-         int n = a.size();
-         tr.resize(4 * n);
          function<void(int, int, int)> cre = [&](int l, int r, int now) {
              if (l + 1 == r) tr[now] = node(l, r, a[l]);
              else {
@@ -38,11 +37,11 @@ class SegTree {
                  tr[now] = node(l, r, op()(tr[now * 2 + 1].v, tr[now * 2 + 2].v));
              }
          };
-         cre(0, n, 0);
+         cre(0, a.size(), 0);
      }
      void upd(int l, int r, T tag, int now = 0) {
          if (l >= r || tr[now].r <= l || tr[now].l >= r) return;
-         else if (tr[now].r <= r && tr[now].l >= l) tr[now].mod(tag);
+         else if (tr[now].r <= r && tr[now].l >= l) mod(now, tag);
          else {
              pd(now);
              upd(l, r, tag, now * 2 + 1);
@@ -59,6 +58,7 @@ class SegTree {
          }
      }
 };
+template<typename T, size_t N, class op> struct SegTree<T, N, op>::node SegTree<T, N, op>::tr[4 * N];
 
 const int INF = 0x3f3f3f3f;
 template<typename T>
